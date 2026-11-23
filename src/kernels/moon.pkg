@@ -1,0 +1,7 @@
+// Pure kernels the reference worker serves: each is a function of its arguments
+// alone, so every executor computes the same bits for the same graph.
+
+import {
+  "moonbitstack/moondask",
+  "moonbitlang/core/math",
+}

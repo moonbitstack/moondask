@@ -1,0 +1,23 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moondask/kernels"
+
+import {
+  "moonbitstack/moondask",
+}
+
+// Values
+pub fn dot(FixedArray[Double], FixedArray[Double]) -> Double
+
+pub fn monte_carlo_pi(Int64, UInt64) -> Double
+
+pub fn registry() -> @moondask.Registry
+
+pub fn sum_range(Int64, Int64) -> Double
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
