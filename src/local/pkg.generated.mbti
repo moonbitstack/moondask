@@ -1,0 +1,30 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moondask/local"
+
+import {
+  "moonbitlang/core/json",
+  "moonbitstack/moondask",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Local {
+  registry : @moondask.Registry
+  concurrency : Int32
+}
+pub fn Local::concurrency(Self) -> Int32
+pub async fn Local::gather(Self, @moondask.Graph, keys~ : Array[String]) -> Array[@json.Json] raise @moondask.Fault
+pub fn Local::label(Self) -> String
+pub async fn Local::map(Self, Array[@json.Json], name~ : String) -> Array[@json.Json] raise @moondask.Fault
+pub fn Local::new(registry? : @moondask.Registry, concurrency? : Int32) -> Self
+pub fn Local::registry(Self) -> @moondask.Registry
+pub async fn Local::run(Self, @moondask.Graph, cancel? : @moondask.Cancel) -> @moondask.Outcome raise @moondask.Fault
+pub impl @moondask.Executor for Local
+
+// Type aliases
+pub type Done = (String, Result[@json.Json, String], Int64)
+
+// Traits
