@@ -33,7 +33,9 @@ def patched(text, flag):
     """The package file with the C stub compiled and linked with OpenMP on."""
     if STUB not in text:
         sys.exit(f"{PACKAGE} does not look like the package file this expects")
-    link = json.dumps({"native": {"stub-cc-flags": flag, "stub-cc-link-flags": flag}})
+    link = json.dumps(
+        {"native": {"stub-cc-flags": flag, "cc-link-flags": flag}}
+    )
     addition = f'  "native-stub": [ "kernel.c" ],\n  link: {link},'
     return text.replace(STUB, addition, 1)
 
