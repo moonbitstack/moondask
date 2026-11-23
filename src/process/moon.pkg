@@ -17,6 +17,7 @@ import {
   "moonbitstack/moonjson",
   "moonbitstack/moondask/kernels",
   "moonbitstack/moondask/local",
+  "moonbitlang/core/env",
 } for "test"
 
 // Every test starts real worker processes from one build directory, so they take

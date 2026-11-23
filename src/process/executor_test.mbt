@@ -21,7 +21,8 @@ async fn worker_command() -> Array[String] {
     worker_built.val = true
   }
   let suffix = if @async.platform is Windows { ".exe" } else { "" }
-  ["_build/native/debug/build/cmd/worker/worker\{suffix}"]
+  let root = @env.current_dir().unwrap_or(".")
+  ["\{root}/_build/native/debug/build/cmd/worker/worker\{suffix}"]
 }
 
 ///|
@@ -51,7 +52,11 @@ async test "a graph runs on worker processes" {
   let graph = @moondask.Graph::new()
   chunks(graph) |> ignore
   let executor = @process.Process::new(worker=worker_command(), workers=2)
-  let outcome = executor.run(graph)
+  let outcome = try {
+    executor.run(graph)
+  } catch {
+    error => abort("the pool refused to run: \{@moondask.describe(error)}")
+  }
   inspect(outcome.is_ok(), content="true")
   let in_process = @local.Local::new(registry=@kernels.registry()).run(graph)
   inspect(
