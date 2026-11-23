@@ -20,9 +20,9 @@ async fn worker_command() -> Array[String] {
     }
     worker_built.val = true
   }
-  let suffix = if @async.platform is Windows { ".exe" } else { "" }
+  // The build directory names every executable with `.exe`, on every host.
   let root = @env.current_dir().unwrap_or(".")
-  ["\{root}/_build/native/debug/build/cmd/worker/worker\{suffix}"]
+  ["\{root}/_build/native/debug/build/cmd/worker/worker.exe"]
 }
 
 ///|
