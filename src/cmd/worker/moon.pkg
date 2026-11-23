@@ -2,8 +2,13 @@ pkgtype(kind: "executable")
 
 supported_targets = "native"
 
+// `async fn main` refers to the async package on some hosts and not on others, so the
+// import below is needed on the hosts that use it and idle on the rest.
+
+warnings = "-unused_package"
+
 import {
+  "moonbitlang/async",
   "moonbitstack/moondask/kernels",
   "moonbitstack/moondask/worker" @serve,
-  "moonbitlang/async",
 }
