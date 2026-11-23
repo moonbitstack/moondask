@@ -74,19 +74,19 @@ def main():
         run(
             options.moon,
             work,
+            "run",
+            "src/examples/04-parallel-kernels",
+            "--target",
+            "native",
+        )
+        run(
+            options.moon,
+            work,
             "test",
             "--target",
             "native",
             "-p",
             "moonbitstack/moondask/omp",
-        )
-        run(
-            options.moon,
-            work,
-            "run",
-            "src/examples/04-parallel-kernels",
-            "--target",
-            "native",
         )
 
 

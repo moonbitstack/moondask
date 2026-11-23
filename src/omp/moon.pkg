@@ -5,9 +5,7 @@
 
 options(
   "native-stub": [ "kernel.c" ],
-  targets: {
-    "kernel_test.mbt": [ "native" ],
-  },
+  targets: { "kernel_test.mbt": [ "native" ] },
 )
 
 #cfg(target = "native")

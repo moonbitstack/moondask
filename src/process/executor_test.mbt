@@ -52,9 +52,7 @@ async test "a graph runs on worker processes" {
   let graph = @moondask.Graph::new()
   chunks(graph) |> ignore
   let executor = @process.Process::new(worker=worker_command(), workers=2)
-  let outcome = try {
-    executor.run(graph)
-  } catch {
+  let outcome = executor.run(graph) catch {
     error => abort("the pool refused to run: \{@moondask.describe(error)}")
   }
   inspect(outcome.is_ok(), content="true")
