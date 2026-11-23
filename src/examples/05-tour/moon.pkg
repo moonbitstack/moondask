@@ -1,0 +1,14 @@
+pkgtype(kind: "executable")
+
+supported_targets = "native"
+
+import {
+  "moonbitstack/moondask",
+  "moonbitstack/moondask/kernels",
+  "moonbitstack/moondask/local",
+  "moonbitstack/moondask/omp",
+  "moonbitstack/moondask/process",
+  "moonbitstack/moondask/worker",
+  "moonbitlang/async",
+  "moonbitlang/core/env",
+}

@@ -1,0 +1,14 @@
+pkgtype(kind: "executable")
+
+// `async fn main` needs an async runtime that wasm-gc does not have in this
+// release of the async library, so this example runs everywhere else.
+
+supported_targets = "+all-wasm-gc"
+
+import {
+  "moonbitstack/moondask",
+  "moonbitstack/moondask/kernels",
+  "moonbitstack/moondask/local",
+  "moonbitlang/async",
+  "moonbitlang/core/env",
+}
