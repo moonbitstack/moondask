@@ -49,12 +49,14 @@ jobs:
       - name: moon test (all backends)
         run: moon test --target all
 
+      # The worker processes are programs of their own, so the examples that start them have to be
+      # run, not just built.
       - name: examples run
         if: runner.os == 'Linux'
         run: |
           for dir in src/examples/*/; do
-            if grep -q 'kind: "executable"' "$dir/moon.pkg" && ! grep -q 'supported_targets = "js"' "$dir/moon.pkg"; then
-              moon run "$dir" --target native > /dev/null
+            if grep -q 'kind: "executable"' "$dir/moon.pkg"; then
+              moon run "$dir" --target native
             fi
           done
 
@@ -70,7 +72,6 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           for dir in docs/skills/*/; do
-            case "$dir" in *CHANGE-ME*) continue ;; esac
             [ -f "$dir/SKILL.md" ] || continue
             pipx run --spec skills-ref agentskills validate "$dir"
           done
@@ -80,3 +81,22 @@ jobs:
       - name: the code in the docs compiles
         if: runner.os == 'Linux'
         run: python3 scripts/check_snippets.py
+
+  # The parallel kernels have three builds. The default one, on the thread pool, is covered by the
+  # matrix above; this job builds them with OpenMP instead and runs the same tests against it.
+  openmp:
+    permissions:
+      contents: read
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: install moonbit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: build and test with OpenMP
+        run: python3 scripts/check_openmp.py
