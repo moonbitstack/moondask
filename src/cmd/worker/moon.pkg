@@ -1,0 +1,9 @@
+pkgtype(kind: "executable")
+
+supported_targets = "native"
+
+import {
+  "moonbitstack/moondask/kernels",
+  "moonbitstack/moondask/worker" @serve,
+  "moonbitlang/async",
+}

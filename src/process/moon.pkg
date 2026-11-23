@@ -1,0 +1,29 @@
+// The out-of-process executor: a pool of worker programs, one request in flight
+// per worker, and a queue that hands out work as dependencies are satisfied.
+// Native only: it is the one package here that starts a process.
+
+#cfg(target = "native")
+import {
+  "moonbitstack/moondask",
+  "moonbitlang/async",
+  "moonbitlang/async/aqueue",
+  "moonbitlang/async/process" @subprocess,
+  "moonbitlang/async/stdio",
+  "moonbitlang/core/bench",
+}
+
+#cfg(target = "native")
+import {
+  "moonbitstack/moonjson",
+  "moonbitstack/moondask/kernels",
+  "moonbitstack/moondask/local",
+} for "test"
+
+// Every test starts real worker processes from one build directory, so they take
+// turns rather than compete for it.
+
+max_concurrent_tests = 1
+
+options(
+  targets: { "executor_test.mbt": [ "native" ] },
+)

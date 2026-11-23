@@ -1,0 +1,15 @@
+// The worker side of the protocol: read a request line, run the named task,
+// write a reply line. A worker needs two streams and nothing else, so the loop
+// takes any reader and writer; the convenience that uses the standard streams is
+// native, where an executor starts a worker.
+
+import {
+  "moonbitstack/moondask",
+  "moonbitlang/async/io",
+  "moonbitlang/core/env",
+}
+
+#cfg(target = "native")
+import {
+  "moonbitlang/async/stdio",
+}

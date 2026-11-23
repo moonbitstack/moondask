@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moondask/worker"
+
+import {
+  "moonbitlang/async/io",
+  "moonbitstack/moondask",
+}
+
+// Values
+pub fn answer(@moondask.Registry, StringView) -> Answer
+
+pub fn handle(@moondask.Registry, StringView) -> String
+
+pub async fn serve(@moondask.Registry, &@io.Reader, &@io.Writer) -> Unit
+
+// Errors
+
+// Types and methods
+pub(all) enum Answer {
+  Written(String)
+  Ended
+}
+
+// Type aliases
+
+// Traits
