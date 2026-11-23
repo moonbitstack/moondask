@@ -6,6 +6,13 @@
 /// are identical across the three builds. Reductions add the same numbers in a
 /// different order, so they agree to rounding rather than to the bit; the
 /// estimate of π counts integers, so it agrees exactly.
+///
+/// A build takes the OpenMP path when the stub is compiled with `-fopenmp` (gcc,
+/// clang) or `/openmp` (the Microsoft compiler) **and** the program that links the
+/// kernels is linked with the same flag: the kernels are an archive by then, so
+/// the runtime they call is pulled in at the last step, which is the consumer's
+/// link line. Without the flag the same loops run on the pool, and one thread
+/// makes them run on the caller's.
 #borrow(values)
 extern "C" fn c_sum(values : FixedArray[Double]) -> Double = "moondask_sum"
 

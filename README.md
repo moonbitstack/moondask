@@ -84,7 +84,8 @@ worker, up to `retries` times. `moondask/worker` is the other end of that protoc
 estimate of π over flat arrays of doubles, with the thread count, the splitting schedule and core
 placement as knobs. Compiled with `-fopenmp` the loops are OpenMP's; without it the same loops run on
 a pool of pthreads, or of Win32 threads; with one thread they run on the caller's. `backend()` says
-which of the three a build took.
+which of the three a build took. Turning OpenMP on takes the flag in two places — the stub, and the
+program that links it — because the runtime is pulled in at the last link.
 
 ## Interface
 
