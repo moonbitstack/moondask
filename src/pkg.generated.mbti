@@ -1,13 +1,176 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitstack/CHANGE-ME"
+package "moonbitstack/moondask"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "moonbitlang/core/ref",
+}
 
 // Values
-pub fn greet(StringView) -> String
+pub async fn apply(Registry, Body, Inputs) -> @json.Json
+
+pub fn args_of(Body) -> @json.Json
+
+pub fn decode(StringView) -> @json.Json raise Fault
+
+pub fn deps_of(Task, Map[String, @json.Json]) -> Map[String, @json.Json]
+
+pub fn describe(Error) -> String
+
+pub fn doubles(@json.Json) -> FixedArray[Double] raise Fault
+
+pub fn encode(@json.Json) -> String
+
+pub fn numbers(FixedArray[Double]) -> @json.Json
+
+pub fn portable(Body) -> Bool
+
+pub fn submit(&Executor, Graph) -> Run
 
 // Errors
+#derive(@debug.Debug)
+pub(all) suberror Fault {
+  Duplicate(key~ : String)
+  Missing(key~ : String, dep~ : String)
+  Cycle(keys~ : Array[String])
+  Unknown(name~ : String)
+  NotPortable(key~ : String)
+  MissingResult(key~ : String)
+  Failed(key~ : String, reason~ : String)
+  Aborted(reason~ : String)
+  Stopped
+}
+pub fn Fault::message(Self) -> String
 
 // Types and methods
+pub(all) enum Body {
+  Call(name~ : String, args~ : @json.Json)
+  Fn((Inputs) -> @json.Json raise)
+  Async(async (Inputs) -> @json.Json)
+}
+
+pub struct Cancel {
+  stopped : @ref.Ref[Bool]
+}
+pub fn Cancel::is_stopped(Self) -> Bool
+pub fn Cancel::new() -> Self
+pub fn Cancel::stop(Self) -> Unit
+
+pub struct Graph {
+  order : Array[String]
+  nodes : Map[String, Task]
+}
+pub fn Graph::add(Self, Task) -> Unit raise Fault
+pub fn Graph::async_closure(Self, String, Array[String], async (Inputs) -> @json.Json) -> Unit raise Fault
+pub fn Graph::call(Self, String, Array[String], name~ : String, args? : @json.Json) -> Unit raise Fault
+pub fn Graph::closure(Self, String, Array[String], (Inputs) -> @json.Json raise) -> Unit raise Fault
+pub fn Graph::contains(Self, String) -> Bool
+pub fn Graph::copy(Self) -> Self
+pub fn Graph::get(Self, String) -> Task?
+pub fn Graph::keys(Self) -> Array[String]
+pub fn Graph::levels(Self) -> Array[Array[String]] raise Fault
+pub fn Graph::map(Self, String, Array[String], name~ : String, args? : @json.Json) -> Array[String] raise Fault
+pub fn Graph::map_with(Self, String, Array[String], (Inputs) -> @json.Json raise) -> Array[String] raise Fault
+pub fn Graph::new() -> Self
+pub fn Graph::size(Self) -> Int32
+pub fn Graph::topological(Self) -> Array[String] raise Fault
+pub fn Graph::validate(Self) -> Unit raise Fault
+
+pub(all) struct Inputs {
+  args : @json.Json
+  deps : Map[String, @json.Json]
+  attempt : Int32
+}
+pub fn Inputs::arg(Self, String) -> @json.Json raise Fault
+pub fn Inputs::dep(Self, String) -> @json.Json raise Fault
+pub fn Inputs::integer(Self, String) -> Int64 raise Fault
+pub fn Inputs::new(args? : @json.Json, deps? : Map[String, @json.Json], attempt? : Int32) -> Self
+pub fn Inputs::number(Self, String) -> Double raise Fault
+pub fn Inputs::text(Self, String) -> String raise Fault
+
+pub(all) struct Outcome {
+  results : Map[String, @json.Json]
+  failures : Map[String, String]
+  skipped : Array[String]
+  mut cancelled : Bool
+  mut elapsed_us : Int64
+  timings : Map[String, Int64]
+}
+pub fn Outcome::elapsed_us(Self) -> Int64
+pub fn Outcome::failures(Self) -> Map[String, String]
+pub fn Outcome::gather(Self, Array[String]) -> Array[@json.Json] raise Fault
+pub fn Outcome::get(Self, String) -> @json.Json raise Fault
+pub fn Outcome::has(Self, String) -> Bool
+pub fn Outcome::is_ok(Self) -> Bool
+pub fn Outcome::keys(Self) -> Array[String]
+pub fn Outcome::new(elapsed_us? : Int64) -> Self
+pub fn Outcome::skipped(Self) -> Array[String]
+pub fn Outcome::timing_us(Self, String) -> Int64?
+pub fn Outcome::to_json(Self) -> @json.Json
+
+pub struct Registry {
+  table : Map[String, (Inputs) -> @json.Json raise]
+}
+pub fn Registry::add(Self, String, (Inputs) -> @json.Json raise) -> Unit
+pub fn Registry::contains(Self, String) -> Bool
+pub fn Registry::names(Self) -> Array[String]
+pub fn Registry::new() -> Self
+pub fn Registry::of(String, (Inputs) -> @json.Json raise) -> Self
+pub fn Registry::run(Self, String, Inputs) -> @json.Json raise
+
+pub(all) struct Reply {
+  id : Int32
+  outcome : Result[@json.Json, String]
+}
+pub fn Reply::from_json(@json.Json) -> Self raise Fault
+pub fn Reply::to_json(Self) -> @json.Json
+
+pub(all) struct Request {
+  id : Int32
+  key : String
+  attempt : Int32
+  name : String
+  args : @json.Json
+  deps : Map[String, @json.Json]
+}
+pub fn Request::from_json(@json.Json) -> Self raise Fault
+pub fn Request::inputs(Self) -> Inputs
+pub fn Request::of(Int32, Int32, Task, Map[String, @json.Json]) -> Self raise Fault
+pub fn Request::to_json(Self) -> @json.Json
+
+pub struct Run {
+  executor : &Executor
+  graph : Graph
+  cancel : Cancel
+  outcome : @ref.Ref[Outcome?]
+}
+pub fn Run::cancel(Self) -> Unit
+pub fn Run::cancel_flag(Self) -> Cancel
+pub async fn Run::gather(Self, Array[String]) -> Array[@json.Json] raise Fault
+pub fn Run::graph(Self) -> Graph
+pub async fn Run::wait(Self) -> Outcome raise Fault
+
+pub(all) struct Task {
+  key : String
+  deps : Array[String]
+  body : Body
+}
+pub fn Task::async_closure(String, Array[String], async (Inputs) -> @json.Json) -> Self
+pub fn Task::call(String, Array[String], name~ : String, args? : @json.Json) -> Self
+pub fn Task::closure(String, Array[String], (Inputs) -> @json.Json raise) -> Self
 
 // Type aliases
+pub type AsyncHandler = async (Inputs) -> @json.Json
+
+pub type Handler = (Inputs) -> @json.Json raise
+
+pub type Key = String
 
 // Traits
+pub(open) trait Executor {
+  async fn run(Self, Graph, cancel? : Cancel) -> Outcome raise Fault
+  fn label(Self) -> String
+  async fn map(Self, Array[@json.Json], name~ : String) -> Array[@json.Json] raise Fault = _
+  async fn gather(Self, Graph, keys~ : Array[String]) -> Array[@json.Json] raise Fault = _
+}

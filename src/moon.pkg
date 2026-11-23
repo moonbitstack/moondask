@@ -1,2 +1,7 @@
-// What this package implements, and a first-hand link to the specification it
-// implements. A package without that link is not finished.
+// A graph of keyed tasks, the contract every executor meets, and the worker
+// protocol they share. Nothing here touches a file, a socket or a thread:
+// scheduling policy lives in the executor packages.
+
+import {
+  "moonbitstack/moonjson",
+}
