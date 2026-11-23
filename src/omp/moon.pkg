@@ -1,0 +1,14 @@
+// OpenMP-shaped parallel kernels behind a C stub: the loops and reductions that
+// a MoonBit program cannot write itself, because a closure never crosses a
+// thread. The knobs, and the sequential versions the parallel ones are checked
+// against, are plain MoonBit and stay available on every target.
+
+options(
+  "native-stub": [ "kernel.c" ],
+  targets: { "kernel_test.mbt": [ "native" ] },
+)
+
+#cfg(target = "native")
+import {
+  "moonbitstack/moondask/kernels",
+} for "test"

@@ -1,0 +1,48 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moondask/omp"
+
+// Values
+pub fn axpy_serial(Double, FixedArray[Double], FixedArray[Double]) -> Unit
+
+pub fn dot_serial(FixedArray[Double], FixedArray[Double]) -> Double
+
+pub let knobs : Knobs
+
+pub fn scale_serial(FixedArray[Double], Double) -> Unit
+
+pub fn sum_serial(FixedArray[Double]) -> Double
+
+// Errors
+
+// Types and methods
+pub(all) enum Affinity {
+  None
+  Compact
+  Spread
+}
+
+pub(all) enum Backend {
+  Serial
+  Threads
+  Openmp
+}
+
+pub(all) struct Knobs {
+  threads : Int32
+  schedule : Schedule
+  affinity : Affinity
+}
+pub fn Knobs::new(threads? : Int32, schedule? : Schedule, affinity? : Affinity) -> Self
+pub fn Knobs::with_affinity(Self, Affinity) -> Self
+pub fn Knobs::with_schedule(Self, Schedule) -> Self
+pub fn Knobs::with_threads(Self, Int32) -> Self
+
+pub(all) enum Schedule {
+  Static
+  Dynamic(chunk~ : Int32)
+  Guided
+}
+
+// Type aliases
+
+// Traits
