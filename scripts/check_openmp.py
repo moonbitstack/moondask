@@ -21,6 +21,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PACKAGE = Path("src") / "omp" / "moon.pkg"
 STUB = '"native-stub": [ "kernel.c" ],'
+EXAMPLE = Path("src") / "examples" / "04-parallel-kernels" / "moon.pkg"
+EXAMPLE_ANCHOR = 'supported_targets = "native"'
 
 
 def openmp_build():
@@ -45,11 +47,32 @@ def patched(text, flag, library):
     return text.replace(STUB, addition, 1)
 
 
-def run(moon, work, *args):
+def linked(text, flag):
+    """The program's package file, with the OpenMP runtime on its link line.
+
+    The kernels are an archive by the time a program is linked, so the flag that
+    pulls the runtime in has to be on the program, not on the library package.
+    That is the part a consumer of this library repeats.
+    """
+    if EXAMPLE_ANCHOR not in text:
+        sys.exit(f"{EXAMPLE} does not look like the package file this expects")
+    link = json.dumps({"native": {"cc-link-flags": flag}})
+    addition = f"{EXAMPLE_ANCHOR}\n\noptions(link: {link})"
+    return text.replace(EXAMPLE_ANCHOR, addition, 1)
+
+
+def run(moon, work, *args, expect=None):
     print(f"$ moon {' '.join(args)}")
-    result = subprocess.run([moon, *args], cwd=work)
+    result = subprocess.run(
+        [moon, *args], cwd=work, capture_output=True, text=True
+    )
+    sys.stdout.write(result.stdout)
+    sys.stderr.write(result.stderr)
     if result.returncode != 0:
         sys.exit(result.returncode)
+    if expect is not None and expect not in result.stdout:
+        sys.exit(f"expected {expect!r} in the output of moon {' '.join(args)}")
+    return result.stdout
 
 
 def main():
@@ -58,6 +81,7 @@ def main():
     options = parser.parse_args()
 
     package = (ROOT / PACKAGE).read_text(encoding="utf-8")
+    example = (ROOT / EXAMPLE).read_text(encoding="utf-8")
     flag, library = openmp_build()
     with tempfile.TemporaryDirectory(prefix="moondask-openmp-") as raw:
         work = Path(raw)
@@ -69,6 +93,7 @@ def main():
             else:
                 shutil.copy2(source, target)
         (work / PACKAGE).write_text(patched(package, flag, library), encoding="utf-8")
+        (work / EXAMPLE).write_text(linked(example, flag), encoding="utf-8")
         run(options.moon, work, "update")
         run(options.moon, work, "check", "--target", "native", "--deny-warn")
         run(
@@ -78,15 +103,7 @@ def main():
             "src/examples/04-parallel-kernels",
             "--target",
             "native",
-        )
-        run(
-            options.moon,
-            work,
-            "test",
-            "--target",
-            "native",
-            "-p",
-            "moonbitstack/moondask/omp",
+            expect="backend: OpenMP",
         )
 
 

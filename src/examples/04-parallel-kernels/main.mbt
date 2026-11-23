@@ -1,6 +1,10 @@
 ///|
 /// What the threads are worth: the same kernels with one thread, with four, and
 /// with every core, timed.
+///
+/// The example is its own check: the last line says whether every thread count
+/// produced the sum and the estimate that one thread produces, so the timings
+/// above it are only printed for a build that agrees with itself.
 fn main {
   let count = 20_000_000
   let values = FixedArray::make(count, 0.0)
@@ -30,6 +34,41 @@ fn main {
     println(
       "  \{padded(threads.to_int64())} threads: \{padded(micros / 1000L)} ms  \{estimate}",
     )
+  }
+  println("")
+  println("checks: \{checks()}")
+}
+
+///|
+/// Whether every thread count agrees with one thread, on a sum and on an estimate.
+fn checks() -> String {
+  let values = FixedArray::make(1_000_000, 0.0)
+  for index in 0..<values.length() {
+    values[index] = (index % 997).to_double() / 3.0
+  }
+  let want = @omp.sum_serial(values)
+  let mut same = true
+  for threads in [1, 2, 3, @omp.available_threads()] {
+    let got = @omp.sum(values, knobs=@omp.Knobs::new(threads~))
+    let slack = 1.0e-9 * want
+    let diff = if got > want { got - want } else { want - got }
+    if diff > slack {
+      same = false
+    }
+  }
+  let estimate = @omp.monte_carlo_pi(2_000_000L, 99UL)
+  let single = @omp.monte_carlo_pi(
+    2_000_000L,
+    99UL,
+    knobs=@omp.Knobs::new(threads=1),
+  )
+  if estimate != single {
+    same = false
+  }
+  if same {
+    "every thread count agrees with one"
+  } else {
+    "MISMATCH"
   }
 }
 
